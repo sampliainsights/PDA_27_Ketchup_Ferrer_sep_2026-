@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ketchup Ferrer · Samplia Insights</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300..900&family=Roboto+Condensed:wght@400..800&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Paleta Samplia (lksjdfls.pdf): 375395 · 0F1729 · FBDBDF · E9455B · E0253F · B51A03 */
+  --dusk:#375395; --ink:#0F1729; --blush:#FBDBDF; --melon:#E9455B; --rasp:#E0253F; --brick:#B51A03;
+  /* Derivados neutros y tintes (hex fijos: html2canvas no entiende color-mix) */
+  --paper:#FFFFFF; --mist:#F6F7F9; --line:#E2E4EA; --ink-70:#3F4554; --ink-50:#5E6472;
+  --dusk-300:#9BA9CA; --dusk-100:#E7EAF2; --blush-50:#FDF0F2; --neutral:#BCC0C9;
+  --ease-out:cubic-bezier(.23,1,.32,1); --ease-in-out:cubic-bezier(.77,0,.175,1); --ease-drawer:cubic-bezier(.32,.72,0,1);
+  --side:292px;
+  --font:'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  --font-head:'Roboto Condensed', 'Roboto', 'Arial Narrow', Arial, sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:calc(env(safe-area-inset-top,0px) + 76px);-webkit-text-size-adjust:100%}
+body{margin:0;font-family:var(--font);color:var(--ink);background:var(--mist);font-size:15px;line-height:1.5;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--dusk);outline-offset:2px;border-radius:6px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- Sidebar ---------- */
+.sidebar{position:fixed;inset:0 auto 0 0;width:var(--side);background:var(--paper);border-right:1px solid var(--line);
+  display:flex;flex-direction:column;z-index:40;padding:calc(env(safe-area-inset-top,0px) + 24px) 20px calc(env(safe-area-inset-bottom,0px) + 20px)}
+.sidebar-scroll{overflow-y:auto;flex:1;margin:0 -20px;padding:0 20px;overscroll-behavior:contain}
+.brand{position:relative;display:flex;justify-content:center;margin-bottom:22px}
+.brand .seal{width:188px;height:188px}
+.brand .close{display:none;position:absolute;top:0;right:0}
+.f-group{margin-bottom:18px}
+.f-label{display:block;font-family:var(--font-head);font-weight:600;font-size:.86rem;text-transform:uppercase;letter-spacing:.03em;margin-bottom:8px}
+.seg{position:relative;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--mist);border:1px solid var(--line);border-radius:4px;padding:3px}
+.seg-ind{position:absolute;top:3px;bottom:3px;left:3px;border-radius:3px;background:var(--rasp);
+  transition:transform 220ms var(--ease-out);will-change:transform}
+.seg button{position:relative;z-index:1;border:0;background:none;padding:8px 4px;font-size:.82rem;font-weight:600;border-radius:3px;cursor:pointer;
+  color:var(--ink-70);transition:color 160ms ease, transform 160ms var(--ease-out)}
+.seg button:active{transform:scale(.97)}
+.seg button[aria-pressed="true"]{color:#fff}
+.f-note{font-size:.76rem;color:var(--ink-50);margin:6px 2px 0}
+.nav{margin:6px 0 18px;border-top:1px solid var(--line);padding-top:14px}
+.nav a{display:flex;font-family:var(--font-head);text-transform:uppercase;letter-spacing:.03em;justify-content:space-between;align-items:center;padding:7px 10px;margin:0 -10px;border-radius:3px;color:var(--ink-70);text-decoration:none;font-weight:600;font-size:.9rem;transition:background-color 160ms ease,color 160ms ease}
+.nav a.active{background:var(--blush-50);color:var(--rasp)}
+@media (hover:hover) and (pointer:fine){.nav a:hover{background:var(--mist);color:var(--ink)}.nav a.active:hover{background:var(--blush-50);color:var(--rasp)}}
+.status{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--ink-50);margin-bottom:12px}
+.status i{width:8px;height:8px;border-radius:50%;background:var(--neutral);flex:none}
+.status.live i{background:var(--dusk)} .status.local i{background:var(--melon)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:var(--paper);border-radius:3px;padding:9px 14px;font-family:var(--font-head);font-weight:700;font-size:.86rem;text-transform:uppercase;letter-spacing:.03em;cursor:pointer;transition:transform 160ms var(--ease-out),background-color 160ms ease}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--rasp);border-color:var(--rasp);color:#fff}
+@media (hover:hover) and (pointer:fine){.btn.primary:hover{background:var(--brick);border-color:var(--brick)}}
+.btn[disabled]{opacity:.6;cursor:progress}
+.btn-row{display:flex;gap:8px;margin-bottom:18px}
+.btn-row .btn{flex:1;padding:9px 8px;letter-spacing:.01em;white-space:nowrap}
+
+/* Preguntas plegables (final del sidebar) */
+.qbox{border-top:1px solid var(--line);margin-top:auto;padding-top:12px}
+.q-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);background:var(--mist);border-radius:4px;padding:11px 14px;font-family:var(--font-head);font-weight:700;font-size:.88rem;text-transform:uppercase;letter-spacing:.03em;cursor:pointer;transition:transform 160ms var(--ease-out)}
+.q-toggle:active{transform:scale(.98)}
+.q-toggle svg{transition:transform 220ms var(--ease-out);flex:none}
+.q-toggle[aria-expanded="true"] svg{transform:rotate(180deg)}
+.q-panel{display:grid;grid-template-rows:0fr;opacity:0;transition:grid-template-rows 240ms var(--ease-out),opacity 200ms var(--ease-out)}
+.q-panel.open{grid-template-rows:1fr;opacity:1}
+.q-panel>div{overflow:hidden}
+.q-list{list-style:none;margin:10px 0 0;padding:0 4px 0 0;counter-reset:q;max-height:52vh;overflow-y:auto}
+.q-list li{counter-increment:q;display:grid;grid-template-columns:24px 1fr;gap:6px;padding:9px 2px;border-bottom:1px solid var(--line);font-size:.82rem;line-height:1.35}
+.q-list li::before{content:counter(q);font-family:var(--font-head);font-weight:800;color:var(--rasp)}
+.q-list li.derived::before{content:'+';color:var(--dusk)}
+.q-list small{display:block;color:var(--ink-50);margin-top:2px}
+
+/* ---------- Topbar móvil ---------- */
+.topbar{display:none;position:sticky;top:0;z-index:30;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);padding:calc(env(safe-area-inset-top,0px) + 10px) 16px 10px;align-items:center;justify-content:space-between;gap:10px;margin-top:calc(-1 * env(safe-area-inset-top,0px))}
+.topbar .seal{width:50px;height:50px}
+.scrim{position:fixed;inset:0;background:rgba(15,23,41,.38);opacity:0;pointer-events:none;transition:opacity 260ms var(--ease-out);z-index:35}
+.scrim.show{opacity:1;pointer-events:auto}
+
+/* ---------- Main ---------- */
+main{margin-left:var(--side);padding:28px 32px 56px;max-width:calc(var(--side) + 1400px)}
+.hero{position:relative;overflow:hidden;background:var(--rasp);color:#fff;border-radius:6px;padding:22px 30px 18px;display:grid;grid-template-columns:1fr auto;gap:22px;align-items:center}
+.hero::after{content:'';position:absolute;right:-90px;bottom:-150px;width:300px;height:300px;border-radius:50%;background:var(--brick);opacity:.35;pointer-events:none}
+.hero>*{position:relative;z-index:1}
+.hero-kicker{font-family:var(--font-head);text-transform:uppercase;letter-spacing:.08em;font-weight:600;font-size:.8rem;opacity:.9;margin:0 0 6px}
+.hero h1{margin:0;font-family:var(--font-head);text-transform:uppercase;font-weight:800;font-size:clamp(1.6rem,2.8vw,2.5rem);line-height:1;letter-spacing:-.005em}
+.hero-sub{margin:6px 0 0;font-size:.86rem;opacity:.94}
+@media (min-width:961px){.hero-sub{white-space:nowrap}}
+.facts{display:flex;flex-wrap:wrap;gap:8px 30px;margin:14px 0 0;padding:10px 0 0;border-top:1px solid rgba(255,255,255,.32)}
+.facts div{min-width:0}
+.facts dt{font-family:var(--font-head);text-transform:uppercase;letter-spacing:.05em;font-size:.7rem;opacity:.85}
+.facts dd{margin:0;font-weight:700;font-size:.95rem}
+.seal{width:140px;height:140px;flex:none}
+.hero-logo[hidden]{display:none}
+.hero-logo{display:block;height:150px;width:auto;border:3px solid #fff;border-radius:6px;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.seal svg{width:100%;height:100%;display:block}
+.seal text{font-family:var(--font-head)}
+@media (prefers-reduced-motion:no-preference){
+  .seal-ring{transform-origin:88px 88px;animation:sealIn 900ms var(--ease-out) both}
+  @keyframes sealIn{from{transform:rotate(-70deg) scale(.94);opacity:0}to{transform:none;opacity:1}}
+  .seal-spin{transform-origin:88px 88px;animation:sealSpin 28s linear infinite}
+  @keyframes sealSpin{to{transform:rotate(360deg)}}
+}
+.active-filter{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:18px 2px 0;font-size:.86rem;color:var(--ink-70);min-height:28px}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:var(--paper);border:1px solid var(--line);font-weight:600;font-size:.8rem}
+.pill b{font-weight:800}
+.pill button{border:0;background:none;padding:0 0 0 2px;cursor:pointer;color:var(--ink-50);font-size:1rem;line-height:1}
+
+section{margin-top:34px}
+.sec-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin:0 2px 14px;flex-wrap:wrap}
+.sec-head h2{margin:0;font-family:var(--font-head);font-size:1.6rem;font-weight:700;line-height:1.15;text-transform:uppercase;padding-bottom:6px;border-bottom:3px solid var(--rasp);display:inline-block}
+.sec-head p{margin:4px 0 0;color:var(--ink-50);font-size:.9rem;max-width:70ch}
+.grid{display:grid;gap:16px}
+.g-2{grid-template-columns:1.15fr 1fr}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:20px 22px 16px;min-width:0;display:flex;flex-direction:column}
+.card h3{margin:0;font-family:var(--font-head);font-size:1.08rem;font-weight:700;text-transform:uppercase;letter-spacing:.01em}
+.card .desc{margin:3px 0 0;color:var(--ink-50);font-size:.84rem}
+.card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.chart-wrap{position:relative;width:100%}
+.chart-err{display:flex;align-items:center;justify-content:center;text-align:center;color:var(--ink-50);font-size:.86rem;border:1px dashed var(--line);border-radius:12px;padding:24px;min-height:160px}
+
+/* KPI */
+.kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin-top:20px}
+.kpi{background:var(--paper);border-radius:12px;padding:0;min-width:0;box-shadow:0 1px 2px rgba(15,23,41,.04),0 4px 16px rgba(15,23,41,.05)}
+.kpi-label{display:flex;align-items:center;gap:9px;margin:0;padding:14px 16px 12px;border-bottom:1px solid var(--line);font-size:.86rem;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi-label::before{content:'';flex:none;width:3px;height:15px;border-radius:2px;background:var(--rasp)}
+.kpi-val{display:flex;align-items:center;gap:6px;margin:0;padding:18px 16px 6px}
+.kpi-val strong{font-size:2.15rem;font-weight:400;letter-spacing:-.01em;line-height:1}
+.kpi-val span{color:var(--ink-50);font-weight:300;font-size:1rem;align-self:flex-end;margin-bottom:3px}
+.kpi-val svg{flex:none;margin-left:4px}
+.kpi-foot{margin:0;padding:0 16px 16px;font-size:.74rem;color:var(--ink-50)}
+.kpi-foot span{display:block}
+.delta{font-weight:500}
+.delta.up{color:var(--dusk)} .delta.down{color:var(--rasp)}
+
+/* Destacados */
+.highlights{background:var(--blush-50);border:1px solid #F6C5CC;border-left:4px solid var(--rasp);border-radius:6px;padding:18px 22px;margin-top:12px}
+.highlights h3{margin:0 0 8px;font-family:var(--font-head);text-transform:uppercase;letter-spacing:.02em;font-size:1.05rem;font-weight:700}
+.highlights ul{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 26px}
+.highlights li{position:relative;padding-left:16px;font-size:.9rem;color:var(--ink-70)}
+.highlights li::before{content:'';position:absolute;left:0;top:.62em;width:7px;height:7px;border-radius:50%;background:var(--rasp)}
+.highlights strong{color:var(--ink)}
+
+/* Toggles pequeños */
+.mini-seg{display:inline-flex;background:var(--mist);border:1px solid var(--line);border-radius:4px;padding:2px}
+.mini-seg button{border:0;background:none;padding:5px 10px;border-radius:3px;font-size:.78rem;font-weight:600;color:var(--ink-70);cursor:pointer;transition:background-color 160ms ease,color 160ms ease,transform 160ms var(--ease-out)}
+.mini-seg button:active{transform:scale(.97)}
+.mini-seg button[aria-pressed="true"]{background:var(--paper);color:var(--ink);box-shadow:0 1px 2px rgba(15,23,41,.12)}
+.switch{display:inline-flex;align-items:center;gap:8px;font-size:.8rem;font-weight:600;color:var(--ink-70);cursor:pointer;user-select:none}
+.switch input{appearance:none;-webkit-appearance:none;width:34px;height:20px;border-radius:99px;background:var(--neutral);position:relative;margin:0;cursor:pointer;transition:background-color 180ms ease}
+.switch input::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform 200ms var(--ease-out)}
+.switch input:checked{background:var(--dusk)} .switch input:checked::after{transform:translateX(14px)}
+.switch input:disabled{opacity:.45;cursor:not-allowed}
+
+/* Dumbbell */
+.db{display:grid;gap:14px;margin-top:4px;overflow-x:clip}  /* las capas .db-pos se desplazan con translateX y desbordaban la página en móvil */
+.db-row{display:grid;grid-template-columns:118px 1fr 54px;gap:12px;align-items:center}
+.db-name{font-size:.86rem;font-weight:650}
+.db-track{position:relative;height:28px}
+.db-track::before{content:'';position:absolute;left:0;right:0;top:50%;height:1px;background:var(--line)}
+.db-ticks{position:absolute;inset:0;display:flex;justify-content:space-between;pointer-events:none}
+.db-ticks span{width:1px;background:var(--line);height:8px;align-self:center}
+.db-bar{position:absolute;top:50%;height:4px;margin-top:-2px;left:0;width:100%;transform-origin:0 50%;background:linear-gradient(90deg,var(--rasp),var(--dusk));border-radius:2px;transition:transform 260ms var(--ease-out)}
+.db-pos{position:absolute;inset:0;transition:transform 260ms var(--ease-out);pointer-events:none}
+.db-dot{position:absolute;top:50%;left:0;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1px rgba(15,23,41,.08)}
+.db-dot.no{background:var(--rasp)} .db-dot.si{background:var(--dusk)}
+.db-gap{font-family:var(--font-head);font-weight:700;font-size:.95rem;text-align:right;color:var(--dusk)}
+.db-axis{display:grid;grid-template-columns:118px 1fr 54px;gap:12px;font-size:.72rem;color:var(--ink-50);margin-top:2px}
+.db-axis div{display:flex;justify-content:space-between}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.8rem;color:var(--ink-70)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:50%;display:inline-block}
+
+
+
+/* Matriz */
+.matrix{width:100%;border-collapse:separate;border-spacing:4px;font-size:.86rem}
+.matrix th{font-weight:650;color:var(--ink-70);font-size:.78rem;text-align:center;padding:4px}
+.matrix th[scope="row"]{text-align:left;font-size:.84rem;color:var(--ink);white-space:nowrap}
+.matrix td{text-align:center;border-radius:4px;padding:12px 6px;font-weight:800;font-size:1.05rem;transition:background-color 220ms ease}
+.matrix td small{display:block;font-weight:600;font-size:.72rem;opacity:.8}
+.matrix td.tot{background:var(--mist);color:var(--ink)}
+.matrix-note{font-size:.82rem;color:var(--ink-70);margin:12px 0 0}
+
+/* Leaderboard de temas */
+.lb{display:flex;flex-direction:column;gap:18px}
+.lb-sum{border:1px solid var(--line);border-radius:6px;padding:16px 18px 18px;background:linear-gradient(180deg,#FFFFFF,var(--mist))}
+.lb-sum-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:12px}
+.lb-kicker{margin:0;font-family:var(--font-head);text-transform:uppercase;letter-spacing:.08em;font-size:.78rem;font-weight:700;color:var(--ink-50)}
+.lb-stats{display:flex;gap:26px;flex-wrap:wrap}
+.lb-stat{display:flex;flex-direction:column;align-items:flex-start;border:0;background:none;padding:0;cursor:pointer;text-align:left}
+.lb-stat b{font-family:var(--font-head);font-size:2rem;font-weight:800;line-height:1;letter-spacing:-.01em}
+.lb-stat span{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:600;color:var(--ink-70);margin-top:4px}
+.lb-stat span i{width:9px;height:9px;border-radius:50%}
+.lb-total{display:flex;gap:3px;height:30px;border-radius:5px;overflow:hidden}
+.lb-total .seg{display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--font-head);font-weight:700;font-size:.86rem;cursor:pointer;min-width:0;white-space:nowrap;overflow:hidden}
+.lb-head{display:grid;grid-template-columns:44px minmax(150px,220px) 1fr 76px;gap:14px;align-items:center;padding:0 12px 8px;border-bottom:1px solid var(--line);font-family:var(--font-head);text-transform:uppercase;letter-spacing:.06em;font-size:.72rem;font-weight:700;color:var(--ink-50)}
+.lb-head .legend{font-family:var(--font);text-transform:none;letter-spacing:0;font-weight:500}
+.lb-head span:last-child{text-align:right}
+.lb-list{display:flex;flex-direction:column;margin-top:-10px}
+.lb-row{display:grid;grid-template-columns:44px minmax(150px,220px) 1fr 76px;gap:14px;align-items:center;padding:11px 12px;border-bottom:1px solid var(--line);border-left:3px solid transparent;cursor:pointer;transition:background-color 160ms ease}
+.lb-row:last-child{border-bottom:0}
+@media (hover:hover) and (pointer:fine){.lb-row:hover{background:var(--blush-50)}}
+.lb-row.active{background:var(--blush-50);border-left-color:var(--rasp)}
+.lb-rank{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;font-family:var(--font-head);font-weight:800;font-size:.95rem;color:var(--ink-50);background:var(--mist);border:1px solid var(--line)}
+.lb-row.top .lb-rank{background:var(--rasp);border-color:var(--rasp);color:#fff;box-shadow:0 3px 10px rgba(224,37,63,.28)}
+.lb-row.top:first-child .lb-rank{width:38px;height:38px;font-size:1.05rem}
+.lb-name{min-width:0}
+.lb-name strong{display:block;font-family:var(--font-head);font-size:1.02rem;font-weight:700;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-name small{display:block;font-size:.76rem;color:var(--ink-50);margin-top:2px}
+.lb-track{position:relative;height:14px;border-radius:99px;background:var(--mist)}
+.lb-bar{display:flex;gap:2px;height:100%;border-radius:99px;overflow:hidden;transform-origin:0 50%}
+.lb-bar .seg{height:100%;min-width:3px}
+.lb-pct{text-align:right;font-family:var(--font-head);font-weight:800;font-size:1.45rem;line-height:1;letter-spacing:-.01em}
+.lb-pct small{display:block;font-family:var(--font);font-weight:500;font-size:.7rem;color:var(--ink-50);letter-spacing:0;margin-top:3px}
+.lb-tip{position:fixed;z-index:60;pointer-events:none;background:var(--ink);color:#fff;border-radius:6px;padding:9px 11px;font-size:.8rem;line-height:1.35;box-shadow:0 8px 24px rgba(0,0,0,.22);max-width:240px}
+.lb-tip b{display:block;font-family:var(--font-head);text-transform:uppercase;letter-spacing:.03em;font-size:.82rem;margin-bottom:3px}
+.lb-tip i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.lb-tip small{display:block;opacity:.75;margin-top:3px}
+@media (prefers-reduced-motion:no-preference){
+  .lb-bar{animation:lbGrow 420ms var(--ease-out) both}
+  .lb-total{animation:lbGrow 420ms var(--ease-out) both;transform-origin:0 50%}
+  @keyframes lbGrow{from{transform:scaleX(0)}to{transform:none}}
+}
+@media (max-width:640px){
+  .lb-head{display:none}
+  .lb-list{margin-top:0}
+  .lb-row{grid-template-columns:36px 1fr 60px;gap:6px 10px;padding:10px 6px}
+  .lb-row .lb-track{grid-column:2 / -1;grid-row:2}
+  .lb-pct{font-size:1.2rem}
+  .lb-stats{gap:18px}
+  .lb-stat b{font-size:1.6rem}
+}
+
+/* Opiniones */
+.vb-tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.search{flex:1;min-width:200px;position:relative}
+.search input{width:100%;border:1px solid var(--line);border-radius:4px;padding:10px 12px 10px 36px;background:var(--paper);font-size:16px}
+.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--ink-50)}
+.vb-count{font-size:.82rem;color:var(--ink-50);margin:0 0 10px}
+.vb-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px}
+.vb{border:1px solid var(--line);border-radius:6px;padding:14px 15px;background:var(--paper);display:flex;flex-direction:column;gap:10px}
+.vb p{margin:0;font-size:.92rem;line-height:1.45}
+.vb mark{background:var(--blush);color:inherit;border-radius:3px;padding:0 1px}
+.vb-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:auto}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;font-size:.72rem;font-weight:650;background:var(--mist);color:var(--ink-70);border:1px solid var(--line)}
+.tag.pos{background:var(--dusk-100);color:var(--dusk);border-color:transparent}
+.tag.neu{background:#EDEFF3;color:var(--ink-70);border-color:transparent}
+.tag.neg{background:#FCE3E6;color:var(--brick);border-color:transparent}
+.tag.score{margin-left:auto;background:none;border:0;color:var(--ink-50);padding:0}
+.empty{grid-column:1/-1;text-align:center;color:var(--ink-50);padding:28px;border:1px dashed var(--line);border-radius:14px;font-size:.9rem}
+.more{margin:14px auto 0;display:flex}
+
+footer{margin-top:40px;color:var(--ink-50);font-size:.78rem;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:16px}
+
+/* Entrada orquestada única al cargar */
+@media (prefers-reduced-motion:no-preference){
+  body.ready .kpi{animation:kpiIn 420ms var(--ease-out) both}
+  body.ready .kpi:nth-child(2){animation-delay:40ms} body.ready .kpi:nth-child(3){animation-delay:80ms}
+  body.ready .kpi:nth-child(4){animation-delay:120ms} body.ready .kpi:nth-child(5){animation-delay:160ms} body.ready .kpi:nth-child(6){animation-delay:200ms}
+  @keyframes kpiIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition-duration:0ms !important;animation:none !important;scroll-behavior:auto !important}
+  .q-panel{transition:opacity 150ms ease !important}
+}
+body.pdf-mode *{animation:none !important;transition:none !important}
+
+/* ---------- Responsive ---------- */
+@media (max-width:1240px){
+  .kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .g-2{grid-template-columns:1fr}
+}
+@media (max-width:960px){
+  .topbar{display:flex}
+  .sidebar{transform:translateX(-100%);transition:transform 320ms var(--ease-drawer);box-shadow:none;width:min(88vw,320px)}
+  .sidebar.open{transform:none;box-shadow:0 0 40px rgba(15,23,41,.18)}
+  .brand .close{display:inline-flex}
+  main{margin-left:0;padding:16px 16px 40px}
+  .hero{grid-template-columns:1fr;padding:20px 18px 16px;border-radius:6px}
+  .hero-logo{position:absolute;right:14px;top:14px;height:96px;border-width:2px}
+  .hero h1,.hero-kicker{padding-right:96px}
+  .highlights ul{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .kpi-val strong{font-size:1.85rem}
+  .card{padding:16px 16px 14px;border-radius:6px}
+  .db-row,.db-axis{grid-template-columns:86px 1fr 44px;gap:8px}
+  .db-name{font-size:.8rem}
+  .facts{gap:10px 22px}
+  .sec-head h2{font-size:1.25rem}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="seal seal-mini" role="img" aria-label="Gran Premio a la Innovación, prueba de producto Barcelona 2026">
+        <svg viewBox="0 0 176 176">
+          <defs><path id="ringPathTop" d="M88,88 m-66,0 a66,66 0 1,1 132,0 a66,66 0 1,1 -132,0"/></defs>
+          <g class="seal-ring">
+            <circle cx="88" cy="88" r="86" fill="#fff"/>
+            <circle cx="88" cy="88" r="79" fill="none" stroke="#E0253F" stroke-width="1.2"/>
+            <g class="seal-spin"><text font-size="9.6" font-weight="700" fill="#E0253F"><textPath href="#ringPathTop" startOffset="0" textLength="406" lengthAdjust="spacingAndGlyphs"><tspan font-weight="900">GRAN PREMIO A LA INNOVACIÓN</tspan> • PRUEBA DE PRODUCTO • BARCELONA 2026 •</textPath></text></g>
+            <circle cx="88" cy="88" r="52" fill="#E0253F"/>
+          </g>
+          <text x="88" y="90" text-anchor="middle" fill="#fff" font-size="34" font-weight="850" data-seal-n>–</text>
+          <text x="88" y="110" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="600">consumidores</text>
+        </svg>
+      </div>
+  <button class="btn" id="openSide" aria-controls="sidebar" aria-expanded="false">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+    Filtros
+  </button>
+</header>
+<div class="scrim" id="scrim"></div>
+<div class="lb-tip" id="lbTip" role="tooltip" hidden></div>
+
+<aside class="sidebar" id="sidebar" aria-label="Filtros y navegación">
+  <div class="brand">
+    <div class="seal" role="img" aria-label="Gran Premio a la Innovación, prueba de producto Barcelona 2026">
+        <svg viewBox="0 0 176 176">
+          <defs><path id="ringPath" d="M88,88 m-66,0 a66,66 0 1,1 132,0 a66,66 0 1,1 -132,0"/></defs>
+          <g class="seal-ring">
+            <circle cx="88" cy="88" r="86" fill="#fff"/>
+            <circle cx="88" cy="88" r="79" fill="none" stroke="#E0253F" stroke-width="1.2"/>
+            <g class="seal-spin"><text font-size="9.6" font-weight="700" fill="#E0253F"><textPath href="#ringPath" startOffset="0" textLength="406" lengthAdjust="spacingAndGlyphs"><tspan font-weight="900">GRAN PREMIO A LA INNOVACIÓN</tspan> • PRUEBA DE PRODUCTO • BARCELONA 2026 •</textPath></text></g>
+            <circle cx="88" cy="88" r="52" fill="#E0253F"/>
+          </g>
+          <text x="88" y="90" text-anchor="middle" fill="#fff" font-size="34" font-weight="850" data-seal-n>–</text>
+          <text x="88" y="110" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="600">consumidores</text>
+        </svg>
+      </div>
+    <button class="btn close" id="closeSide" aria-label="Cerrar filtros">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <div class="sidebar-scroll">
+    <div class="f-group">
+      <span class="f-label" id="lblCompra">¿Comprarían el producto?</span>
+      <div class="seg" id="segCompra" role="group" aria-labelledby="lblCompra">
+        <span class="seg-ind" aria-hidden="true"></span>
+        <button type="button" data-v="all" aria-pressed="true">Todos</button>
+        <button type="button" data-v="Sí" aria-pressed="false">Sí</button>
+        <button type="button" data-v="No" aria-pressed="false">No</button>
+      </div>
+      <p class="f-note" id="compraNote"></p>
+    </div>
+
+    <nav class="nav" aria-label="Secciones">
+      <a href="#resumen" class="active">Resumen</a>
+      <a href="#atributos">Atributos</a>
+      <a href="#compra">Intención de compra</a>
+      <a href="#sentimiento">Sentimiento</a>
+      <a href="#opiniones">Opiniones</a>
+    </nav>
+
+    <div class="status" id="status"><i></i><span>Cargando datos…</span></div>
+    <div class="btn-row">
+      <button class="btn" id="btnReload" type="button">Actualizar</button>
+      <button class="btn primary" id="btnPdf" type="button">Descargar PDF</button>
+    </div>
+  </div>
+
+  <div class="qbox">
+    <button class="q-toggle" id="qToggle" aria-expanded="false" aria-controls="qPanel" type="button">
+      <span>Preguntas de la encuesta</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="q-panel" id="qPanel" role="region" aria-labelledby="qToggle">
+      <div><ol class="q-list" id="qList"></ol></div>
+    </div>
+  </div>
+</aside>
+
+<main id="report">
+  <div data-pdf-block>
+    <div class="hero" id="resumen">
+      <div>
+        <p class="hero-kicker">Samplia Insights para Producto del Año 2027</p>
+        <h1>Ketchup Ferrer</h1>
+        <p class="hero-sub">Encuesta realizada a usuarios que participaron en la prueba de Producto del Año.</p>
+        <dl class="facts">
+          <div><dt>Ciudad</dt><dd>Barcelona</dd></div>
+          <div><dt>Fechas</dt><dd>7 y 8 de octubre de 2026</dd></div>
+          <div><dt>Respuestas</dt><dd id="factN">–</dd></div>
+          <div><dt>Comprarían el producto</dt><dd id="factBuy">–</dd></div>
+        </dl>
+      </div>
+      <img class="hero-logo" id="heroLogo" alt="" hidden>
+    </div>
+    <div class="active-filter" id="activeFilter" aria-live="polite"></div>
+  </div>
+
+  <div class="kpis" id="kpis" data-pdf-block></div>
+
+  <div class="highlights" data-pdf-block>
+    <h3>Lo más destacado</h3>
+    <ul id="insights"></ul>
+  </div>
+
+  <section id="atributos">
+    <div class="sec-head">
+      <div>
+        <h2>Valoración de atributos</h2>
+        <p>Medias en escala de 1 a 5.</p>
+      </div>
+    </div>
+    <div class="grid g-2" data-pdf-block>
+      <article class="card">
+        <div class="card-head">
+          <div><h3>Perfil del producto</h3><p class="desc">Media de cada atributo.</p></div>
+          <label class="switch"><input type="checkbox" id="cmpToggle" checked> Comparar compradores</label>
+        </div>
+        <div class="chart-wrap" style="height:340px"><canvas id="cRadar" aria-label="Gráfico radar con la media de cada atributo" role="img"></canvas></div>
+      </article>
+      <article class="card">
+        <div class="card-head">
+          <div><h3>Qué separa a compradores y no compradores</h3><p class="desc">Media de cada grupo; ordenado por la diferencia.</p></div>
+          <div class="legend"><span><i style="background:var(--rasp)"></i>No comprarían</span><span><i style="background:var(--dusk)"></i>Comprarían</span></div>
+        </div>
+        <div class="db" id="dumbbell"></div>
+        <div class="db-axis" aria-hidden="true"><span></span><div><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div><span></span></div>
+      </article>
+    </div>
+  </section>
+
+  <section id="compra">
+    <div class="sec-head">
+      <div>
+        <h2>Intención de compra</h2>
+        <p>Respuestas a «¿Comprarías este producto?» cruzadas con el sentimiento de su explicación.</p>
+      </div>
+    </div>
+    <article class="card" data-pdf-block>
+        <div class="card-head"><div><h3>Sentimiento según intención de compra</h3><p class="desc">Porcentaje de cada fila; el total es el peso de cada grupo.</p></div></div>
+        <div style="overflow-x:auto"><table class="matrix" id="matrix"></table></div>
+        <p class="matrix-note" id="matrixNote"></p>
+    </article>
+  </section>
+
+  <section id="sentimiento">
+    <div class="sec-head">
+      <div>
+        <h2>Análisis de sentimiento</h2>
+        <p>Clasificación de la respuesta abierta «¿Por qué?» según su sentimiento y la razón que menciona.</p>
+      </div>
+    </div>
+    <article class="card" data-pdf-block>
+      <div class="card-head">
+        <div><h3>Categoría de razón por sentimiento</h3><p class="desc">Ranking de temas según el % de participantes que los menciona (una respuesta puede tocar varios). Pasa el cursor por un segmento para ver su porcentaje y haz clic para leer esas opiniones.</p></div>
+      </div>
+      <div class="lb" id="leaderboard"></div>
+    </article>
+  </section>
+
+  <section id="opiniones">
+    <div class="sec-head">
+      <div>
+        <h2>Opiniones de los participantes</h2>
+        <p>Respuestas literales a «¿Por qué?», con su sentimiento, categoría y valoración global.</p>
+      </div>
+    </div>
+    <article class="card">
+      <div class="vb-tools">
+        <div class="search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          <label for="vbSearch" class="sr-only">Buscar en las opiniones</label>
+          <input id="vbSearch" type="search" placeholder="Buscar una palabra, por ejemplo «precio»" autocomplete="off">
+        </div>
+        <div class="mini-seg" id="vbSent" role="group" aria-label="Filtrar por sentimiento">
+          <button type="button" data-v="all" aria-pressed="true">Todas</button>
+          <button type="button" data-v="Positiva" aria-pressed="false">Positivas</button>
+          <button type="button" data-v="Neutra" aria-pressed="false">Neutras</button>
+          <button type="button" data-v="Negativa" aria-pressed="false">Negativas</button>
+        </div>
+      </div>
+      <p class="vb-count" id="vbCount" aria-live="polite"></p>
+      <div class="vb-list" id="vbList"></div>
+      <button class="btn more" id="vbMore" type="button" hidden>Ver más opiniones</button>
+    </article>
+  </section>
+
+  <footer>
+    <span>Samplia Insights. Datos de la hoja de respuestas de la encuesta.</span>
+    <span id="footStamp"></span>
+  </footer>
+</main>
+
+<script type="text/plain" id="snapshot">Marca temporal,¿Cuál es tu valoración global de este producto?,"¿Cómo consideras la relación calidad-precio de este producto (PVP: PVP: 2,59 €)?","¿Qué te ha parecido el sabor del producto?
+",¿Qué te ha parecido la textura del producto?,"Valora la practicidad del producto.
+",¿Comprarías este producto?,¿Por que?,Sentimiento,Categoría
+7/10/2026 12:44:21,5,5,5,5,5,Sí,"El sabor es natural, suave, muy buen ",Positiva,Sabor
+7/10/2026 12:45:09,5,5,5,5,5,No,Sabor buenísimo y delicioso,Positiva,Sabor
+7/10/2026 12:45:59,5,5,5,4,3,Sí,Está muy rico tiene muy buen sabor muy natural e intenso pero no me gusta que el bote sea de cristal ,Positiva,Envase y practicidad
+7/10/2026 12:46:30,5,5,5,5,5,Sí,está riquiiisimo,Positiva,Sabor
+7/10/2026 12:48:14,5,5,5,5,5,Sí,Tiene un sabor muy rico y una textura agradable,Positiva,Sabor
+7/10/2026 12:48:37,5,5,5,5,5,Sí,Calidad color sabor regusto ,Positiva,Sabor
+7/10/2026 12:48:55,3,3,2,4,2,No,"Pese a tener ingredientes más naturales que otras opciones más comerciales, tiene un sabor algo artificial y demasiado dulce. La cantidad de azúcares es demasiado elevada.",Negativa,Dulzor y azúcar
+7/10/2026 12:50:43,3,2,3,5,3,No,El sabor es agradable y se nota más casero que otras marcas de ketchup pero es demasiado dulce para mi gusto.,Neutra,Dulzor y azúcar
+7/10/2026 12:51:39,5,3,5,5,5,No,De primera creo que no debería compararlo con otros productos similares para ver si podría sustituirlos o no,Neutra,Preferencia o hábito
+7/10/2026 12:55:53,5,4,5,5,4,Sí,Sabor ,Positiva,Sabor
+7/10/2026 12:56:39,4,4,5,5,4,No,No suelo comprar este producto ,Neutra,Preferencia o hábito
+7/10/2026 12:57:04,3,3,3,5,4,No,No me gusta el ketchup.,Negativa,Preferencia o hábito
+7/10/2026 12:57:16,5,5,4,3,4,Sí,Es muy sabroso,Positiva,Sabor
+7/10/2026 12:57:33,4,4,4,4,4,Sí,Sabor ,Positiva,Sabor
+7/10/2026 12:58:06,3,2,2,3,1,No,No me gusta el ketchup en general ,Negativa,Preferencia o hábito
+7/10/2026 12:59:32,5,5,5,5,5,Sí,Hace tiempo que estoy buscando un sabor original.,Positiva,Sabor
+7/10/2026 13:00:28,3,1,3,3,3,Sí,"Porque me ha parecido bueno de sabor pero caro de precio,me lo pensaría al comprarlo ",Neutra,Precio
+7/10/2026 13:00:58,5,5,5,5,5,Sí,Está bien ,Positiva,Sabor
+7/10/2026 13:02:34,2,1,2,2,1,No,"Porque el envase no me gusta,me parece poco práctico ",Negativa,Envase y practicidad
+7/10/2026 13:03:04,4,5,5,5,4,No,Porque se echaría a perder en este formato ,Negativa,Envase y practicidad
+7/10/2026 13:04:59,4,4,4,4,2,Sí,Me ha gustado mucho su sabor,Positiva,Sabor
+7/10/2026 13:11:17,4,3,4,4,4,Sí,Esta muy bueno,Positiva,Sabor
+7/10/2026 13:17:16,3,3,3,4,2,No,Me gusta que sea sano pero no es práctico y el gusto no me termina de convencer ,Negativa,Envase y practicidad
+7/10/2026 13:17:28,4,5,4,4,5,Sí,Porque es rico y ligero y una textura suave .,Positiva,Textura
+7/10/2026 13:17:59,5,3,5,5,5,Sí,Está bueno y tiene un sabor suave,Positiva,Sabor
+7/10/2026 13:19:59,4,5,5,5,4,Sí,"Porque el quetxup me gusta todos , pero este es dulce y bueno para patatas , carne  , huevos etc .",Positiva,Sabor
+7/10/2026 13:21:56,5,4,5,5,4,Sí,Calidad precio buena y muy refrescante,Positiva,Precio
+7/10/2026 13:21:58,4,3,4,3,3,Sí,Me gusta la textura ,Positiva,Textura
+7/10/2026 13:24:12,3,3,3,4,3,Sí,Porque la textura me ha gustado,Positiva,Textura
+7/10/2026 13:25:34,4,4,4,5,4,Sí,Por que  me gusta ,Positiva,Sabor
+7/10/2026 13:25:50,3,2,2,4,5,No,Demasiado gusto a  pepino y se repite,Negativa,Sabor
+7/10/2026 13:27:00,4,4,4,4,5,Sí,Precio y calidad muy competitivo,Positiva,Precio
+7/10/2026 14:00:39,3,5,3,5,3,No,Demasiado dulce y la textura es muy ligera ,Negativa,Dulzor y azúcar
+7/10/2026 14:02:07,5,5,5,5,5,Sí,"Considero que tiene el mismo sabor que un ketxup normal, entiendo que sea elaborado manual 100% y es mucho mas sano que uno que contiene aditivos.",Positiva,Ingredientes naturales
+7/10/2026 14:12:15,5,5,5,5,5,Sí,Esta realmente bueno y el precio me parece aceptable,Positiva,Precio
+7/10/2026 14:17:25,2,2,2,2,2,No,Demasiado gusto a tomate y muy poco a ketchup ,Negativa,Sabor
+7/10/2026 14:48:03,5,5,5,5,5,Sí,Precio calidad y textura muy buena ,Positiva,Precio
+7/10/2026 14:49:30,5,5,5,5,5,Sí,Muy buen sabor ,Positiva,Sabor
+7/10/2026 14:50:55,5,5,5,5,5,Sí,Me encanta,Positiva,Sabor
+7/10/2026 14:55:43,5,4,5,5,5,Sí,"A pesar de ser ketchup, tiene un sabor muy natural y sabe mucho a tómate ",Positiva,Ingredientes naturales
+7/10/2026 15:16:33,5,5,5,5,5,Sí,"Me pareció riquísimo y super buena opción para usar a diario. Menos artificial que otras opciones en el mercado, me encanta su sabor natural.",Positiva,Ingredientes naturales
+7/10/2026 15:20:48,5,5,5,5,5,Sí,Está muy bueno parece natural y casero ,Positiva,Ingredientes naturales
+7/10/2026 15:56:36,4,2,3,3,3,No,Muy caro e incómodo ,Negativa,Precio
+7/10/2026 16:02:28,4,4,5,5,3,Sí,"Porque es un sabor muy fuerte, tipo tomate frito",Positiva,Sabor
+7/10/2026 16:14:36,3,3,3,4,3,No,Demasiado dulce. ,Negativa,Dulzor y azúcar
+7/10/2026 16:21:19,4,2,5,4,3,No,Es muy caro,Negativa,Precio
+7/10/2026 16:25:58,4,4,4,4,4,Sí,Se nota que tiene ingredientes naturales. Tiene mucho sabor a tomate y la textura también me recuerda a una salsa de tomate. Vale la pena.,Positiva,Ingredientes naturales
+7/10/2026 16:27:29,4,4,4,4,4,Sí,Se nota que tiene ingredientes naturales. El sabor y la textura me recuerdan más a una sala de tomate que a un ketchup normal. Vale la pena pagar un poco más.,Positiva,Ingredientes naturales
+7/10/2026 16:30:13,4,3,4,4,4,Sí,Buen sabor y suave,Positiva,Sabor
+7/10/2026 16:38:04,5,3,5,5,5,Sí,tiene un sabor muy natural,Positiva,Ingredientes naturales
+7/10/2026 16:41:59,4,4,3,3,3,Sí,Buen sabor y calidad ,Positiva,Sabor
+7/10/2026 16:44:23,2,2,2,3,2,No,"No me gusta el sabor, la prueba es con patatas chips y creo que es difícil apreciarlo",Negativa,Sabor
+7/10/2026 16:48:41,4,3,4,5,5,Sí,Muy suculento,Positiva,Sabor
+7/10/2026 17:03:48,5,2,5,5,5,Sí,Ajnqu me parece muy caro ,Neutra,Precio
+7/10/2026 17:11:53,5,5,5,5,5,Sí,Muy rico se nota el sabor a tomate,Positiva,Sabor
+7/10/2026 17:14:53,5,5,5,5,5,Sí,Me ha encantado el sabor y además es un frasco grande ,Positiva,Sabor
+7/10/2026 17:15:31,4,3,3,3,4,Sí,Sabor dulce y buena textura,Positiva,Sabor
+7/10/2026 17:16:08,5,4,5,5,5,Sí,Su sabor y textura,Positiva,Sabor
+7/10/2026 17:18:07,5,5,5,5,5,Sí,Muy buen sabor y regusto ,Positiva,Sabor
+7/10/2026 17:29:08,5,5,5,5,5,Sí,Lo mejor es que es natural y combina perfectamente con patatas fritas.,Positiva,Ingredientes naturales
+7/10/2026 17:33:58,3,4,3,5,2,No,Me parece demasiado dulce,Negativa,Dulzor y azúcar
+7/10/2026 17:37:09,5,5,4,4,2,No,Porque al abrirlo lo tenemos que consumir pronto,Negativa,Envase y practicidad
+7/10/2026 17:41:46,5,3,5,5,4,Sí,"Frasco diferente, pero buen sabor",Positiva,Envase y practicidad
+7/10/2026 17:41:51,5,5,5,5,5,Sí,Buen,Positiva,Sabor
+7/10/2026 17:43:20,5,4,5,4,4,Sí,Está muy bueno y tiene bastante cantidad ,Positiva,Sabor
+7/10/2026 17:49:33,3,4,4,4,3,No,Sabe mucho a tomate,Negativa,Sabor
+7/10/2026 18:01:40,4,2,4,3,4,No,Me gusta el sabor pero lo encuentro caro ,Neutra,Precio
+7/10/2026 18:02:47,4,4,4,4,4,Sí,Me gusta el sabor ,Positiva,Sabor
+7/10/2026 18:05:20,5,5,5,5,5,Sí,Escelente sabor y textura,Positiva,Sabor
+7/10/2026 18:15:54,3,3,2,3,3,No,No me ha gustado el sabor,Negativa,Sabor
+7/10/2026 18:17:18,4,5,5,4,1,Sí,Me ha gustado su sabor ,Positiva,Sabor
+7/10/2026 18:17:51,5,5,5,5,5,Sí,Cantidad i sabor,Positiva,Sabor
+7/10/2026 18:27:06,5,4,5,5,4,Sí,Me gusta su sabor suave y la textura orgánica ,Positiva,Textura
+7/10/2026 18:30:42,5,5,5,5,5,Sí,Lo veo natural ,Positiva,Ingredientes naturales
+7/10/2026 18:31:26,5,5,5,5,5,Sí,Sabor parecido a tomate..mas naturAl que ketchup,Positiva,Ingredientes naturales
+7/10/2026 18:33:28,5,4,5,4,5,Sí,Me gusta el sabor ,Positiva,Sabor
+7/10/2026 18:52:21,5,5,5,5,5,Sí,Sabor delicioso ,Positiva,Sabor
+7/10/2026 19:00:26,5,4,5,5,3,No,"Bote demasiado grande, prefiero individual",Negativa,Envase y practicidad
+7/10/2026 19:01:51,4,3,3,4,2,Sí,Parece más sano que el kétchup convencional ,Positiva,Ingredientes naturales
+7/10/2026 19:05:09,3,3,3,3,5,Sí,no me gusta sabor de las patatas,Neutra,Preferencia o hábito
+7/10/2026 19:07:12,4,3,3,5,1,No,Por el tipo de envase solo,Negativa,Envase y practicidad
+7/10/2026 19:07:39,3,3,4,4,4,Sí,Esta bueno,Positiva,Sabor
+7/10/2026 19:10:00,4,2,4,5,4,Sí,Si el precio fuera mas ajustado la verdad que el sabor es muy bueno,Neutra,Precio
+7/10/2026 19:19:05,5,4,5,4,5,Sí,Está bueno,Positiva,Sabor
+8/10/2026 10:12:53,5,5,5,5,5,Sí,Super natural ,Positiva,Ingredientes naturales
+8/10/2026 10:15:11,5,5,5,5,5,Sí,Buen quetxut,Positiva,Sabor
+8/10/2026 10:17:36,5,5,5,5,5,Sí,Me ha gustado el sabor y que venga en bote de cristal ,Positiva,Envase y practicidad
+8/10/2026 10:19:20,3,5,4,5,3,Sí,"Es un ketchup de sabor muy diferente, no me gusta q lleve casi 20 granos d azucar. El formato no es nada practico, seguramente lo compraria solo una vez",Negativa,Dulzor y azúcar
+8/10/2026 10:22:55,5,5,5,5,5,Sí,Esta riquissimo no es el tipo sabor de kepchup es mucho mas bueno. Me gustaria saber en que supers lo venderian,Positiva,Sabor
+8/10/2026 10:31:27,5,5,5,5,2,Sí,"Muy buen sabor, calidad y marca buena. ",Positiva,Sabor
+8/10/2026 10:46:22,5,4,5,5,5,Sí,"Me ha gustado mucho la idea de un ketchup sin conservantes ni colorantes, 100% natural, pero con un sabor igual de rico e intenso.",Positiva,Ingredientes naturales
+8/10/2026 10:47:44,5,5,5,5,5,Sí,Está muy bueno ,Positiva,Sabor
+8/10/2026 11:19:42,4,3,4,3,5,Sí,El sabor ,Positiva,Sabor
+8/10/2026 11:21:11,2,1,1,2,2,No,Demasiado dulce.,Negativa,Dulzor y azúcar
+8/10/2026 11:25:28,3,3,2,3,4,No,Es muy dulce,Negativa,Dulzor y azúcar
+8/10/2026 11:26:15,2,3,2,1,3,No,Demasiado dulce. Casi parece estar comiendo mermelada,Negativa,Dulzor y azúcar
+8/10/2026 11:41:49,3,3,4,3,4,No,Me parece un tomate frito más que un quetxup ,Negativa,Sabor
+8/10/2026 11:42:03,5,5,5,5,5,Sí,"El sabor es bastante natural, no tiene sabor artificial ",Positiva,Ingredientes naturales
+8/10/2026 11:53:47,5,4,4,4,4,No,No le gusta mas que el ketchup normal,Negativa,Preferencia o hábito
+8/10/2026 11:56:51,4,3,3,4,4,Sí,Está bueno ,Positiva,Sabor
+8/10/2026 12:20:30,4,5,5,5,5,Sí,Me a encantado Ferrer es marca que uso romesco ,Positiva,Preferencia o hábito
+8/10/2026 12:24:48,5,4,4,4,5,Sí,Sabor ,Positiva,Sabor
+8/10/2026 12:25:13,4,3,5,4,5,Sí,Porque es una opción natural,Positiva,Ingredientes naturales
+8/10/2026 12:28:49,5,3,4,4,4,Sí,Sabor muy conseguido y muy bueno,Positiva,Sabor
+8/10/2026 12:36:45,4,4,4,5,5,Sí,Tiene buen sabor y textura ,Positiva,Sabor
+8/10/2026 12:48:53,5,5,5,5,5,Sí,Está bien ,Positiva,Sabor
+8/10/2026 12:50:10,3,2,2,3,2,No,Hay alternativas que me gustan mas,Negativa,Preferencia o hábito
+8/10/2026 14:07:54,4,4,3,4,4,Sí,"Está bien aunque es muy dulce, necesita la mitad de azucar",Neutra,Dulzor y azúcar
+8/10/2026 14:49:38,5,5,5,5,5,Sí,Me gusta mucho el sabor y que sabe natural ,Positiva,Ingredientes naturales
+8/10/2026 15:16:15,5,4,5,5,3,Sí,Me ha encantado,Positiva,Sabor
+8/10/2026 15:37:36,5,5,5,5,5,Sí,"Sabor, textura",Positiva,Sabor
+8/10/2026 15:42:55,5,4,5,5,5,Sí,Se siente demasiado natural por lo que lo incluiría en los preparados de mi comida ,Positiva,Ingredientes naturales
+8/10/2026 15:44:40,5,3,5,5,5,No,Lo compraría para mis bocatas aunque su precio es un poco elevado a otras marcas ,Neutra,Precio</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
+<script>
+(() => {
+'use strict';
+
+/* ================= CONFIG ================= */
+const CONFIG = {
+  campaign: 'Ketchup Ferrer',
+  heroImage: '', // URL o data URI de la foto del producto; vacío = sin imagen
+  pdfName: 'Samplia_Insights_Ferrer_Ketchup_Barcelona.pdf',
+  sources: (() => {
+    const base = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQRaLcdoJ4G13_ibij0mjrDIY7cyAOeRGVOTTgItOf9TLbna-TZB7Z_zpHPXESzqk4mm_Xw4UusELwo/pub';
+    const gid = '1494271180';
+    return [
+      { name: 'CSV', url: `${base}?gid=${gid}&single=true&output=csv` },
+      { name: 'CSV-alt', url: `${base}?output=csv&gid=${gid}` }
+    ];
+  })(),
+  snapshotDate: '8 de octubre de 2026',
+  attrs: [
+    { k: 'glob',  label: 'Valoración global',        short: 'Valoración global', art: 'La valoración global',      rx: /valoraci[oó]n global/i },
+    { k: 'qp',    label: 'Relación calidad-precio',  short: 'Calidad-precio',    art: 'La relación calidad-precio', rx: /calidad.?precio/i },
+    { k: 'sabor', label: 'Sabor del producto',       short: 'Sabor',             art: 'El sabor',                  rx: /sabor/i },
+    { k: 'text',  label: 'Textura del producto',     short: 'Textura',           art: 'La textura',                rx: /textura/i },
+    { k: 'prac',  label: 'Practicidad del producto', short: 'Practicidad',       art: 'La practicidad',            rx: /practicidad/i }
+  ],
+  other: [
+    { k: 'ts',     rx: /marca temporal|timestamp/i },
+    { k: 'compra', rx: /comprar[ií]as/i },
+    { k: 'porque', rx: /^¿?\s*por\s*qu[eé]/i },
+    { k: 'sent',   rx: /^sentimiento/i },
+    { k: 'cat',    rx: /categor[ií]a/i }
+  ]
+};
+
+const C = { ink:'#0F1729', ink70:'#3F4554', ink50:'#5E6472', line:'#E2E4EA', dusk:'#375395', dusk300:'#9BA9CA', blush:'#FBDBDF', melon:'#E9455B', rasp:'#E0253F', brick:'#B51A03', neutral:'#BCC0C9', grey:'#8A8F9C' };
+const SENT = ['Positiva', 'Neutra', 'Negativa'];
+const SENT_COLORS = { Positiva: C.dusk, Neutra: C.neutral, Negativa: C.rasp };
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const state = {
+  rows: [], headers: {}, source: '',
+  f: { compra: 'all' },
+  compare: true,
+  vb: { q: '', sent: 'all', theme: null, limit: 12 }
+};
+const charts = {};
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+/* ================= Utilidades ================= */
+const fmt = (n, d = 2) => (n == null || isNaN(n)) ? '–' : n.toLocaleString('es-ES', { minimumFractionDigits: d, maximumFractionDigits: d });
+const pct = (a, b, d = 0) => b ? fmt(100 * a / b, d) + ' %' : '–';
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+const norm = s => String(s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+const cap = s => s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+
+function parseCSV(text) {
+  const rows = []; let row = [], f = '', q = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) {
+      if (c === '"') { if (text[i + 1] === '"') { f += '"'; i++; } else q = false; }
+      else f += c;
+    } else if (c === '"') q = true;
+    else if (c === ',') { row.push(f); f = ''; }
+    else if (c === '\n' || c === '\r') {
+      if (c === '\r' && text[i + 1] === '\n') i++;
+      row.push(f); rows.push(row); row = []; f = '';
+    } else f += c;
+  }
+  if (f !== '' || row.length) { row.push(f); rows.push(row); }
+  return rows.filter(r => r.some(x => String(x).trim() !== ''));
+}
+
+const KEEP_THEMES = ['Envase y practicidad', 'Dulzor y azúcar', 'Preferencia o hábito', 'Ingredientes naturales'];
+function themesOf(cat) {
+  if (!cat) return [];
+  const whole = KEEP_THEMES.find(t => norm(t) === norm(cat).trim());
+  if (whole) return [whole];
+  const out = [];
+  cat.split(/\s*(?:,|\/|\s+y\s+|\s+e\s+|\s+vs\.?\s+)\s*/i).forEach(p => {
+    const t = norm(p).trim(); if (!t) return;
+    let name;
+    if (/ingredient|composici/.test(t)) name = 'Ingredientes';
+    else if (/marca/.test(t)) name = 'Marca';
+    else if (/valor global|^general/.test(t)) name = 'Valoración general';
+    else if (/preferencia/.test(t)) name = 'Preferencia personal';
+    else if (/aceptaci/.test(t)) name = 'Aceptación';
+    else name = cap(p.trim().toLowerCase());
+    if (!out.includes(name)) out.push(name);
+  });
+  return out;
+}
+
+function buildRows(matrix) {
+  if (!matrix.length) throw new Error('La hoja está vacía');
+  const heads = matrix[0].map(h => String(h).replace(/\s+/g, ' ').replace(/(PVP:\s*){2,}/i, 'PVP: ').trim());
+  const idx = {}; const used = new Set();
+  [...CONFIG.other, ...CONFIG.attrs].forEach(def => {
+    const i = heads.findIndex((h, j) => !used.has(j) && def.rx.test(h));
+    if (i >= 0) { idx[def.k] = i; used.add(i); }
+  });
+  const missing = CONFIG.attrs.filter(a => idx[a.k] == null).map(a => a.short);
+  if (missing.length) throw new Error('Faltan columnas: ' + missing.join(', '));
+  state.headers = Object.fromEntries(Object.entries(idx).map(([k, i]) => [k, heads[i]]));
+
+  const num = v => { const n = parseFloat(String(v ?? '').replace(',', '.')); return (n >= 1 && n <= 5) ? n : null; };
+  const rows = [];
+  matrix.slice(1).forEach(r => {
+    const get = k => idx[k] == null ? '' : String(r[idx[k]] ?? '').trim();
+    const o = { ts: get('ts'), porque: get('porque'), cat: get('cat') };
+    CONFIG.attrs.forEach(a => o[a.k] = num(get(a.k)));
+    const cp = norm(get('compra'));
+    o.compra = /^s[ií]?$|^si\b/.test(cp) ? 'Sí' : /^no\b/.test(cp) ? 'No' : null;
+    const s = norm(get('sent'));
+    o.sent = s.startsWith('pos') ? 'Positiva' : s.startsWith('neu') ? 'Neutra' : s.startsWith('neg') ? 'Negativa' : null;
+    o.themes = themesOf(o.cat);
+    if (CONFIG.attrs.some(a => o[a.k] != null) || o.compra) rows.push(o);
+  });
+  if (!rows.length) throw new Error('No hay respuestas válidas');
+  return rows;
+}
+
+/* ================= Carga de datos ================= */
+async function fetchText(url, ms = 9000) {
+  const ctrl = new AbortController(); const t = setTimeout(() => ctrl.abort(), ms);
+  try {
+    const res = await fetch(url + (url.includes('?') ? '&' : '?') + '_=' + Date.now(), { signal: ctrl.signal, cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return await res.text();
+  } finally { clearTimeout(t); }
+}
+
+async function loadData() {
+  setStatus('', 'Cargando datos…');
+  if (/^https?:$/.test(location.protocol)) {
+    for (const s of CONFIG.sources) {
+      try {
+        const txt = await fetchText(s.url);
+        if (!/valoraci/i.test(txt.slice(0, 600))) throw new Error('Respuesta sin cabeceras esperadas');
+        state.rows = buildRows(parseCSV(txt)); state.source = 'live';
+        setStatus('live', `Datos en vivo de la hoja (${state.rows.length} respuestas)`);
+        return;
+      } catch (e) { console.warn('[datos] ' + s.name + ' falló:', e.message); }
+    }
+  }
+  const snap = $('#snapshot').textContent.trim();
+  state.rows = buildRows(parseCSV(snap)); state.source = 'local';
+  setStatus('local', `Copia local del ${CONFIG.snapshotDate}. Sin conexión con la hoja.`);
+}
+function setStatus(kind, text) { const el = $('#status'); el.className = 'status ' + kind; el.lastElementChild.textContent = text; }
+
+/* ================= Filtros ================= */
+const byBuy = r => state.f.compra === 'all' || r.compra === state.f.compra;
+const rowsAll = () => state.rows;                         // ignora el filtro de compra
+const rowsSel = () => state.rows.filter(byBuy);
+
+function stats(rows, k) {
+  const v = rows.map(r => r[k]).filter(x => x != null);
+  const dist = [0, 0, 0, 0, 0]; v.forEach(x => dist[Math.round(x) - 1]++);
+  return { n: v.length, mean: v.length ? v.reduce((a, b) => a + b, 0) / v.length : null, dist, top2: v.filter(x => x >= 4).length };
+}
+
+/* ================= Chart.js ================= */
+const hasChart = typeof window.Chart !== 'undefined';
+if (hasChart) {
+  if (window.ChartDataLabels) Chart.register(window.ChartDataLabels);
+  Chart.defaults.font.family = "'Roboto','Helvetica Neue',Arial,sans-serif";
+  Chart.defaults.font.size = 12;
+  Chart.defaults.color = C.ink50;
+  // Ajustar propiedades sin sustituir el objeto: reemplazarlo rompe la animación del tooltip ("this._fn is not a function")
+  if (reduceMotion) Chart.defaults.animation = false;
+  else Object.assign(Chart.defaults.animation, { duration: 280, easing: 'easeOutQuart' });
+  Chart.defaults.plugins.legend.labels.usePointStyle = true;
+  Chart.defaults.plugins.legend.labels.boxWidth = 8;
+  Chart.defaults.plugins.legend.labels.boxHeight = 8;
+  Chart.defaults.plugins.tooltip.backgroundColor = C.ink;
+  Chart.defaults.plugins.tooltip.padding = 10;
+  Chart.defaults.plugins.tooltip.cornerRadius = 8;
+  Chart.defaults.plugins.tooltip.titleFont = { weight: '700' };
+  if (Chart.defaults.plugins.datalabels) Chart.defaults.plugins.datalabels.display = false;
+}
+function chartFail(id) {
+  const cv = document.getElementById(id); if (!cv) return;
+  const d = document.createElement('div'); d.className = 'chart-err';
+  d.textContent = 'No se pudo cargar la librería de gráficos. Revisa la conexión y pulsa «Actualizar».';
+  cv.replaceWith(d);
+}
+function upsert(id, cfgFn, updFn) {
+  if (!hasChart) { chartFail(id); return null; }
+  try {
+    if (!charts[id]) charts[id] = new Chart(document.getElementById(id), cfgFn());
+    else { updFn(charts[id]); charts[id].update(); }
+    return charts[id];
+  } catch (e) { console.error('[gráfico] ' + id, e); chartFail(id); return null; }
+}
+function hexA(hex, a) { const n = parseInt(hex.slice(1), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; }
+
+/* ---------- KPI ---------- */
+function renderKPIs() {
+  const sel = rowsSel(), all = rowsAll();
+  const S = CONFIG.attrs.map(a => ({ a, s: stats(sel, a.k), t: stats(all, a.k) }));
+  $('#kpis').innerHTML = S.map(({ a, s, t }) => {
+    // Con el filtro de compra activo: flecha de tendencia y diferencia frente al total
+    let trend = '', foot = `${pct(s.top2, s.n)} puntúa 4 o 5`;
+    if (state.f.compra !== 'all' && s.mean != null && t.mean != null) {
+      const d = s.mean - t.mean, up = d >= 0;
+      trend = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${up ? C.dusk : C.rasp}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${up ? '<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>' : '<path d="M3 7l6 6 4-4 8 8"/><path d="M15 17h6v-6"/>'}</svg>`;
+      foot = `<span class="delta ${up ? 'up' : 'down'}">${up ? '+' : '−'}${fmt(Math.abs(d))} frente al total</span><span>${foot}</span>`;
+    }
+    return `<article class="kpi">
+      <p class="kpi-label" title="${a.label}">${a.short}</p>
+      <div class="kpi-val"><strong>${fmt(s.mean)}</strong><span>/ 5</span>${trend}</div>
+      <p class="kpi-foot">${foot}</p>
+    </article>`;
+  }).join('') + buyKPI();
+}
+function buyKPI() {
+  const sel = rowsSel();
+  const si = sel.filter(r => r.compra === 'Sí').length, no = sel.filter(r => r.compra === 'No').length, n = si + no;
+  return `<article class="kpi">
+      <p class="kpi-label" title="Comprarían el producto">Comprarían</p>
+      <div class="kpi-val"><strong>${pct(si, n)}</strong></div>
+      <p class="kpi-foot">${pct(no, n)} no lo compraría</p>
+    </article>`;
+}
+
+/* ---------- Radar ---------- */
+function radarDatasets() {
+  const ds = [];
+  const mk = (label, rows, color, fill, dash) => ({
+    label, data: CONFIG.attrs.map(a => stats(rows, a.k).mean),
+    borderColor: color, backgroundColor: fill ? hexA(color, .14) : 'transparent', fill: !!fill,
+    borderWidth: 2, borderDash: dash || [], pointBackgroundColor: color, pointBorderColor: '#fff', pointBorderWidth: 1.5, pointRadius: 4, pointHoverRadius: 6
+  });
+  const f = state.f.compra;
+  const main = f === 'Sí' ? ['Comprarían', C.dusk] : f === 'No' ? ['No comprarían', C.rasp] : ['Total', C.grey];
+  ds.push(mk(main[0], rowsSel(), main[1], true));
+  if (state.compare && f === 'all') {
+    const all = rowsAll();
+    ds.push(mk('Comprarían', all.filter(r => r.compra === 'Sí'), C.dusk, false, [5, 4]));
+    ds.push(mk('No comprarían', all.filter(r => r.compra === 'No'), C.rasp, false, [5, 4]));
+  }
+  return ds;
+}
+function renderRadar() {
+  $('#cmpToggle').disabled = state.f.compra !== 'all';
+  upsert('cRadar', () => ({
+    type: 'radar',
+    data: { labels: CONFIG.attrs.map(a => a.short), datasets: radarDatasets() },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      layout: { padding: 4 },
+      scales: { r: {
+        min: 1, max: 5, ticks: { stepSize: 1, backdropColor: 'transparent', color: C.ink50, font: { size: 10 }, showLabelBackdrop: false },
+        grid: { color: C.line }, angleLines: { color: C.line },
+        pointLabels: { color: C.ink, font: { size: 12, weight: '650' }, padding: 10 }
+      } },
+      plugins: {
+        legend: { position: 'bottom', labels: { color: C.ink70, padding: 14 } },
+        tooltip: { callbacks: { label: c => `${c.dataset.label}: ${fmt(c.raw)}` } },
+        datalabels: {
+          display: c => c.datasetIndex === 0 && c.dataset.data[c.dataIndex] != null,
+          formatter: v => fmt(v, 2), color: C.ink, backgroundColor: 'rgba(255,255,255,.92)', borderRadius: 4,
+          padding: { top: 2, bottom: 2, left: 4, right: 4 }, font: { size: 10.5, weight: '800' }, align: 'end', anchor: 'end', offset: 2
+        }
+      }
+    }
+  }), ch => { ch.data.datasets = radarDatasets(); });
+}
+
+/* ---------- Dumbbell ---------- */
+function renderDumbbell() {
+  const all = rowsAll(), si = all.filter(r => r.compra === 'Sí'), no = all.filter(r => r.compra === 'No');
+  const items = CONFIG.attrs.map(a => ({ a, s: stats(si, a.k).mean, n: stats(no, a.k).mean }))
+    .map(x => ({ ...x, gap: (x.s ?? NaN) - (x.n ?? NaN) }))
+    .sort((x, y) => (isNaN(y.gap) ? -9 : y.gap) - (isNaN(x.gap) ? -9 : x.gap));
+  const host = $('#dumbbell');
+  const pos = v => v == null ? 0 : (v - 1) / 4 * 100;
+  if (!host.children.length || host.dataset.keys !== items.map(i => i.a.k).join()) {
+    host.dataset.keys = items.map(i => i.a.k).join();
+    host.innerHTML = items.map(i => `
+      <div class="db-row" data-k="${i.a.k}">
+        <span class="db-name">${i.a.short}</span>
+        <div class="db-track" role="img">
+          <div class="db-ticks"><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="db-pos" data-w="bar"><div class="db-bar"></div></div>
+          <div class="db-pos" data-w="no"><span class="db-dot no"></span></div>
+          <div class="db-pos" data-w="si"><span class="db-dot si"></span></div>
+        </div>
+        <span class="db-gap"></span>
+      </div>`).join('');
+  }
+  items.forEach(i => {
+    const row = host.querySelector(`[data-k="${i.a.k}"]`);
+    const lo = Math.min(pos(i.n), pos(i.s)), hi = Math.max(pos(i.n), pos(i.s));
+    row.querySelector('[data-w="no"]').style.transform = `translateX(${pos(i.n)}%)`;
+    row.querySelector('[data-w="si"]').style.transform = `translateX(${pos(i.s)}%)`;
+    const bar = row.querySelector('[data-w="bar"]');
+    bar.style.transform = `translateX(${lo}%)`;
+    bar.firstElementChild.style.transform = `scaleX(${(hi - lo) / 100})`;
+    const g = row.querySelector('.db-gap');
+    g.textContent = isNaN(i.gap) ? '–' : (i.gap >= 0 ? '+' : '−') + fmt(Math.abs(i.gap));
+    g.style.color = i.gap >= 0 ? C.dusk : C.rasp;
+    row.querySelector('.db-track').setAttribute('aria-label', `${i.a.short}: comprarían ${fmt(i.s)}, no comprarían ${fmt(i.n)}`);
+  });
+}
+
+/* ---------- Intención de compra ---------- */
+
+function renderMatrix() {
+  const all = rowsAll().filter(r => r.compra && r.sent);
+  const groups = [['Sí', 'Comprarían', C.dusk], ['No', 'No comprarían', C.rasp]];
+  let html = '<thead><tr><th></th>' + SENT.map(s => `<th scope="col">${s}</th>`).join('') + '<th scope="col">Total</th></tr></thead><tbody>';
+  groups.forEach(([k, label, col]) => {
+    const g = all.filter(r => r.compra === k);
+    html += `<tr><th scope="row" style="color:${col}">${label}</th>`;
+    SENT.forEach(s => {
+      const c = g.filter(r => r.sent === s).length, share = g.length ? c / g.length : 0;
+      const bg = hexA(col, .08 + .8 * share), fg = share > .45 ? '#fff' : C.ink;
+      html += `<td style="background:${bg};color:${fg}">${pct(c, g.length)}</td>`;
+    });
+    html += `<td class="tot">${pct(g.length, all.length)}</td></tr>`;
+  });
+  html += '</tbody>';
+  $('#matrix').innerHTML = html;
+  const siNeg = all.filter(r => r.compra === 'Sí' && r.sent === 'Negativa').length;
+  const noPos = all.filter(r => r.compra === 'No' && r.sent === 'Positiva').length;
+  const coh = all.filter(r => (r.compra === 'Sí' && r.sent !== 'Negativa') || (r.compra === 'No' && r.sent === 'Negativa')).length;
+  $('#matrixNote').innerHTML = all.length
+    ? `En <strong>${pct(coh, all.length)}</strong> de los casos el sentimiento encaja con la decisión de compra. Un ${pct(siNeg, all.length)} compraría pese a una opinión negativa y un ${pct(noPos, all.length)} no compraría pese a una positiva.`
+    : 'Sin respuestas clasificadas con el filtro actual.';
+}
+
+/* ---------- Sentimiento y categorías (leaderboard) ---------- */
+const SENT_PLURAL = { Positiva: 'positivas', Neutra: 'neutras', Negativa: 'negativas' };
+function themeData() {
+  const sel = rowsSel().filter(r => r.sent);
+  const map = new Map();
+  sel.forEach(r => r.themes.forEach(k => {
+    if (!map.has(k)) map.set(k, { Positiva: 0, Neutra: 0, Negativa: 0, t: 0 });
+    const o = map.get(k); o[r.sent]++; o.t++;
+  }));
+  const entries = [...map.entries()].sort((a, b) => b[1].t - a[1].t || b[1].Negativa - a[1].Negativa);
+  const tot = { t: sel.length }; SENT.forEach(s => tot[s] = sel.filter(r => r.sent === s).length);
+  return { entries, tot, n: sel.length };
+}
+function renderTheme() {
+  const { entries, tot, n } = themeData();
+  const P = c => n ? 100 * c / n : 0;
+  const tip = (title, s, v, foot) => `data-tip-title="${esc(title)}" data-tip-sent="${s}" data-tip-val="${fmt(v, 1)} %"` + (foot ? ` data-tip-foot="${esc(foot)}"` : '');
+  const legend = SENT.map(s => `<span><i style="background:${SENT_COLORS[s]}"></i>${s}</span>`).join('');
+
+  // Resumen: sentimiento general (suma 100 %)
+  const summary = `
+    <div class="lb-sum">
+      <div class="lb-sum-head">
+        <p class="lb-kicker">Sentimiento general</p>
+        <div class="lb-stats">${SENT.map(s => `
+          <button type="button" class="lb-stat" data-sent="${s}" aria-label="${s}: ${pct(tot[s], n)}. Ver estas opiniones">
+            <b style="color:${s === 'Neutra' ? C.ink50 : SENT_COLORS[s]}">${pct(tot[s], n)}</b><span><i style="background:${SENT_COLORS[s]}"></i>${s}</span>
+          </button>`).join('')}
+        </div>
+      </div>
+      <div class="lb-total">${SENT.filter(s => tot[s]).map(s => `
+        <span class="seg" data-sent="${s}" style="flex:${tot[s]} 1 0;background:${SENT_COLORS[s]};${s === 'Neutra' ? 'color:' + C.ink : ''}" ${tip('Sentimiento general', s, P(tot[s]))}>${P(tot[s]) >= 8 ? pct(tot[s], n) : ''}</span>`).join('')}
+      </div>
+    </div>`;
+
+  // Ranking de temas: las barras se escalan respecto al líder
+  const max = entries.length ? P(entries[0][1].t) : 100;
+  const rows = entries.map(([name, o], i) => {
+    const dom = SENT.reduce((a, b) => o[b] > o[a] ? b : a, SENT[0]);
+    const active = state.vb.theme && state.vb.theme.v === name;
+    const segs = SENT.filter(s => o[s]).map(s =>
+      `<span class="seg" style="width:${100 * P(o[s]) / P(o.t)}%;background:${SENT_COLORS[s]}" ${tip(name, s, P(o[s]), `Menciona el tema: ${fmt(P(o.t), 1)} %`)}></span>`).join('');
+    const aria = `${i + 1}. ${name}: lo menciona el ${pct(o.t, n)}; ` + SENT.map(s => `${s.toLowerCase()} ${pct(o[s], n)}`).join(', ') + '. Ver estas opiniones';
+    return `
+      <div class="lb-row${i < 3 ? ' top' : ''}${active ? ' active' : ''}" role="button" tabindex="0" data-theme="${esc(name)}" aria-label="${esc(aria)}" aria-pressed="${active}">
+        <span class="lb-rank">${String(i + 1).padStart(2, '0')}</span>
+        <span class="lb-name"><strong>${esc(name)}</strong><small>${pct(o[dom], o.t)} de sus menciones son ${SENT_PLURAL[dom]}</small></span>
+        <span class="lb-track"><span class="lb-bar" style="width:${max ? 100 * P(o.t) / max : 0}%;animation-delay:${Math.min(i, 12) * 45}ms">${segs}</span></span>
+        <span class="lb-pct">${pct(o.t, n)}<small>menciona</small></span>
+      </div>`;
+  }).join('');
+
+  $('#leaderboard').innerHTML = summary + `
+    <div>
+      <div class="lb-head" aria-hidden="true"><span>#</span><span>Tema</span><div class="legend">${legend}</div><span>Menciones</span></div>
+      <div class="lb-list">${rows || '<div class="empty">Sin opiniones clasificadas con este filtro.</div>'}</div>
+    </div>`;
+}
+function initLeaderboard() {
+  const lb = $('#leaderboard'), tipEl = $('#lbTip');
+  const hide = () => { tipEl.hidden = true; };
+  lb.addEventListener('mousemove', e => {
+    const seg = e.target.closest('[data-tip-sent]');
+    if (!seg) return hide();
+    const s = seg.dataset.tipSent;
+    tipEl.innerHTML = `<b>${esc(seg.dataset.tipTitle)}</b><i style="background:${SENT_COLORS[s]}"></i>${s}: <strong>${seg.dataset.tipVal}</strong>` +
+      (seg.dataset.tipFoot ? `<small>${esc(seg.dataset.tipFoot)}</small>` : '');
+    tipEl.hidden = false;
+    const w = tipEl.offsetWidth, h = tipEl.offsetHeight;
+    let x = e.clientX + 14, y = e.clientY - h - 12;
+    if (x + w > innerWidth - 8) x = e.clientX - w - 14;
+    if (y < 8) y = e.clientY + 18;
+    tipEl.style.left = x + 'px'; tipEl.style.top = y + 'px';
+  });
+  lb.addEventListener('mouseleave', hide);
+  window.addEventListener('scroll', hide, { passive: true });
+  lb.addEventListener('click', e => {
+    const sent = e.target.closest('[data-sent]');
+    if (sent) { hide(); setVbSent(sent.dataset.sent, true); return; }
+    const row = e.target.closest('.lb-row');
+    if (row) { hide(); setVbTheme(row.dataset.theme); }
+  });
+  lb.addEventListener('keydown', e => {
+    const row = e.target.closest('.lb-row');
+    if (row && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); setVbTheme(row.dataset.theme); }
+  });
+}
+
+function vbRows() {
+  const q = norm(state.vb.q).trim();
+  return rowsSel().filter(r => r.porque)
+    .filter(r => state.vb.sent === 'all' || r.sent === state.vb.sent)
+    .filter(r => !state.vb.theme || (state.vb.theme.mode === 'grouped' ? r.themes.includes(state.vb.theme.v) : r.cat === state.vb.theme.v))
+    .filter(r => !q || norm(r.porque).includes(q) || norm(r.cat).includes(q));
+}
+function highlight(text) {
+  const q = state.vb.q.trim(); if (!q) return esc(text);
+  const nt = norm(text), nq = norm(q); let out = '', i = 0, j;
+  while ((j = nt.indexOf(nq, i)) !== -1) { out += esc(text.slice(i, j)) + '<mark>' + esc(text.slice(j, j + q.length)) + '</mark>'; i = j + q.length; }
+  return out + esc(text.slice(i));
+}
+function renderVerbatims() {
+  const list = vbRows(), total = rowsSel().filter(r => r.porque).length;
+  const shown = list.slice(0, state.vb.limit);
+  const cls = { Positiva: 'pos', Neutra: 'neu', Negativa: 'neg' };
+  $('#vbList').innerHTML = shown.length ? shown.map(r => `
+    <article class="vb">
+      <p>${highlight(r.porque)}</p>
+      <div class="vb-meta">
+        ${r.sent ? `<span class="tag ${cls[r.sent]}">${r.sent}</span>` : '<span class="tag">Sin clasificar</span>'}
+        ${r.compra ? `<span class="tag">${r.compra === 'Sí' ? 'Lo compraría' : 'No lo compraría'}</span>` : ''}
+        ${r.cat ? `<span class="tag">${esc(r.cat)}</span>` : ''}
+        ${r.glob != null ? `<span class="tag score">Global ${r.glob}/5</span>` : ''}
+      </div>
+    </article>`).join('')
+    : `<div class="empty">Ninguna opinión coincide con estos filtros. Prueba con otra palabra o quita el filtro de tema.</div>`;
+  $('#vbCount').textContent = `Mostrando ${shown.length} de ${list.length} opiniones` + (list.length !== total ? ` (${total} en total con los filtros generales)` : '');
+  $('#vbMore').hidden = list.length <= state.vb.limit;
+}
+function setVbSent(v, scroll) {
+  state.vb.sent = v; state.vb.limit = 12;
+  $$('#vbSent button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === v)));
+  renderVerbatims(); renderActiveFilter();
+  if (scroll) $('#opiniones').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
+}
+function setVbTheme(v) {
+  state.vb.theme = v ? { v, mode: 'grouped' } : null; state.vb.limit = 12;
+  renderVerbatims(); renderActiveFilter(); renderTheme();
+  if (v) $('#opiniones').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
+}
+
+/* ---------- Destacados ---------- */
+function renderInsights() {
+  const sel = rowsSel(), all = rowsAll();
+  const S = CONFIG.attrs.map(a => ({ a, m: stats(sel, a.k).mean })).filter(x => x.m != null).sort((x, y) => y.m - x.m);
+  const out = [];
+  if (S.length) out.push(`<strong>${S[0].a.short}</strong> es el atributo mejor valorado (${fmt(S[0].m)}) y <strong>${S[S.length - 1].a.short.toLowerCase()}</strong> el más bajo (${fmt(S[S.length - 1].m)}).`);
+  const si = all.filter(r => r.compra === 'Sí'), no = all.filter(r => r.compra === 'No');
+  if (state.f.compra === 'all') out.push(`<strong>${pct(si.length, si.length + no.length)}</strong> compraría el producto (${si.length} de ${si.length + no.length} participantes).`);
+  else out.push(`Estás viendo solo a quienes <strong>${state.f.compra === 'Sí' ? 'sí' : 'no'}</strong> lo comprarían: ${sel.length} participantes.`);
+  const gaps = CONFIG.attrs.map(a => ({ a, s: stats(si, a.k).mean, n: stats(no, a.k).mean })).filter(x => x.s != null && x.n != null).map(x => ({ ...x, g: x.s - x.n })).sort((x, y) => y.g - x.g);
+  if (gaps.length) out.push(`${gaps[0].a.art} es lo que más separa a compradores (${fmt(gaps[0].s)}) de no compradores (${fmt(gaps[0].n)}), una diferencia de <strong>${fmt(gaps[0].g)}</strong> puntos.`);
+  const cl = sel.filter(r => r.sent), neg = cl.filter(r => r.sent === 'Negativa');
+  if (cl.length) {
+    const tc = {}; neg.forEach(r => r.themes.forEach(t => tc[t] = (tc[t] || 0) + 1));
+    const top = Object.entries(tc).sort((a, b) => b[1] - a[1])[0];
+    out.push(`<strong>${pct(cl.filter(r => r.sent === 'Positiva').length, cl.length)}</strong> de las opiniones son positivas` +
+      (top ? `; en las negativas el tema más citado es <strong>${top[0].toLowerCase()}</strong> (${top[1]} de ${neg.length}).` : '.'));
+  }
+  $('#insights').innerHTML = out.map(t => `<li>${t}</li>`).join('');
+}
+
+/* ---------- Varios ---------- */
+function renderHero() {
+  const sel = rowsSel(), all = rowsAll();
+  const si = all.filter(r => r.compra === 'Sí').length, n = all.filter(r => r.compra).length;
+  $('#factN').textContent = sel.length + (sel.length !== state.rows.length ? ` de ${state.rows.length}` : '');
+  $('#factBuy').textContent = pct(si, n);
+  $$('[data-seal-n]').forEach(el => el.textContent = sel.length);
+  const nSi = state.rows.filter(r => r.compra === 'Sí').length, nNo = state.rows.filter(r => r.compra === 'No').length;
+  $('#compraNote').textContent = `${pct(nSi, nSi + nNo)} responde que sí y ${pct(nNo, nSi + nNo)} que no.`;
+}
+function renderActiveFilter() {
+  const parts = [];
+  if (state.f.compra !== 'all') parts.push(`<span class="pill">${state.f.compra === 'Sí' ? 'Comprarían' : 'No comprarían'} <button type="button" data-clear="compra" aria-label="Quitar filtro de compra">×</button></span>`);
+  if (state.vb.theme) parts.push(`<span class="pill">Tema: <b>${esc(state.vb.theme.v)}</b> <button type="button" data-clear="theme" aria-label="Quitar filtro de tema">×</button></span>`);
+  const n = rowsSel().length;
+  $('#activeFilter').innerHTML = parts.length ? `<span>Mostrando ${n} respuestas con:</span>${parts.join('')}` : `<span>Mostrando las ${n} respuestas.</span>`;
+}
+
+function renderQuestions() {
+  const h = state.headers;
+  const scale = '<small>Escala de 1 a 5</small>';
+  const items = [
+    [h.glob || '¿Cuál es tu valoración global de este producto?', scale],
+    [h.qp || '¿Cómo consideras la relación calidad-precio de este producto (PVP: 2,59 €)?', scale],
+    [h.sabor || '¿Qué te ha parecido el sabor del producto?', scale],
+    [h.text || '¿Qué te ha parecido la textura del producto?', scale],
+    [h.prac || 'Valora la practicidad del producto.', scale],
+    [h.compra || '¿Comprarías este producto?', '<small>Sí / No. Es el filtro de la parte superior</small>'],
+    [h.porque || '¿Por qué?', '<small>Respuesta abierta</small>']
+  ];
+  $('#qList').innerHTML = items.map(([q, s]) => `<li><span>${esc(q)}${s}</span></li>`).join('') +
+    `<li class="derived"><span>Sentimiento y Categoría de razón<small>Clasificación posterior de la respuesta abierta</small></span></li>`;
+}
+
+function renderHeroImage() {
+  const img = $('#heroLogo'); if (!img || !CONFIG.heroImage) return;
+  img.src = CONFIG.heroImage; img.alt = CONFIG.campaign; img.hidden = false;
+}
+renderHeroImage();
+function renderAll() {
+  renderHero(); renderActiveFilter(); renderKPIs(); renderInsights();
+  renderRadar(); renderDumbbell();
+  renderMatrix(); renderTheme(); renderVerbatims();
+}
+
+/* ================= Controles ================= */
+function setupSeg(el, onChange) {
+  const btns = $$('button', el), ind = $('.seg-ind', el);
+  ind.style.width = `calc((100% - 6px) / ${btns.length})`;
+  const sync = () => { const i = btns.findIndex(b => b.getAttribute('aria-pressed') === 'true'); ind.style.transform = `translateX(${Math.max(i, 0) * 100}%)`; };
+  btns.forEach(b => b.addEventListener('click', () => {
+    btns.forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    sync(); onChange(b.dataset.v);
+  }));
+  sync();
+  return { set: v => { btns.forEach(x => x.setAttribute('aria-pressed', String(x.dataset.v === v))); sync(); } };
+}
+let segCompra;
+function initControls() {
+  initLeaderboard();
+  segCompra = setupSeg($('#segCompra'), v => { state.f.compra = v; renderAll(); });
+  $('#cmpToggle').addEventListener('change', e => { state.compare = e.target.checked; renderRadar(); renderHero(); });
+  $$('#vbSent button').forEach(b => b.addEventListener('click', () => setVbSent(b.dataset.v)));
+  let t; $('#vbSearch').addEventListener('input', e => { clearTimeout(t); t = setTimeout(() => { state.vb.q = e.target.value; state.vb.limit = 12; renderVerbatims(); }, 120); });
+  $('#vbMore').addEventListener('click', () => { state.vb.limit += 12; renderVerbatims(); });
+  $('#activeFilter').addEventListener('click', e => {
+    const k = e.target.closest('[data-clear]')?.dataset.clear; if (!k) return;
+    if (k === 'compra') { state.f.compra = 'all'; segCompra.set('all'); renderAll(); }
+    if (k === 'theme') setVbTheme(null);
+  });
+
+  // Preguntas plegables
+  const qt = $('#qToggle'), qp = $('#qPanel');
+  qt.addEventListener('click', () => {
+    const open = qt.getAttribute('aria-expanded') !== 'true';
+    qt.setAttribute('aria-expanded', String(open)); qp.classList.toggle('open', open);
+    if (open) setTimeout(() => qp.scrollIntoView({ block: 'nearest', behavior: reduceMotion ? 'auto' : 'smooth' }), 240);
+  });
+
+  // Cajón lateral en móvil
+  const side = $('#sidebar'), scrim = $('#scrim'), ob = $('#openSide');
+  const openSide = o => { side.classList.toggle('open', o); scrim.classList.toggle('show', o); ob.setAttribute('aria-expanded', String(o)); if (o) $('#closeSide').focus(); };
+  ob.addEventListener('click', () => openSide(true));
+  $('#closeSide').addEventListener('click', () => openSide(false));
+  scrim.addEventListener('click', () => openSide(false));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && side.classList.contains('open')) { openSide(false); ob.focus(); } });
+  $$('.nav a').forEach(a => a.addEventListener('click', () => { if (window.innerWidth <= 960) openSide(false); }));
+
+  // Sección activa en la navegación
+  const links = $$('.nav a');
+  const io = new IntersectionObserver(es => {
+    es.forEach(en => { if (en.isIntersecting) links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + en.target.id)); });
+  }, { rootMargin: '-35% 0px -60% 0px' });
+  ['resumen', 'atributos', 'compra', 'sentimiento', 'opiniones'].forEach(id => io.observe(document.getElementById(id)));
+
+  $('#btnReload').addEventListener('click', async () => {
+    const b = $('#btnReload'); b.disabled = true;
+    try { await loadData(); renderAll(); } catch (e) { setStatus('local', 'Error: ' + e.message); }
+    b.disabled = false;
+  });
+  $('#btnPdf').addEventListener('click', exportPDF);
+}
+
+/* ================= PDF (librerías bajo demanda) ================= */
+const loadScript = src => new Promise((ok, ko) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = () => ko(new Error('No se pudo cargar ' + src)); document.head.appendChild(s); });
+async function exportPDF() {
+  const btn = $('#btnPdf'), label = btn.textContent; btn.disabled = true; btn.textContent = 'Generando…';
+  document.body.classList.add('pdf-mode');
+  try {
+    if (!window.html2canvas) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+    if (!window.jspdf) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+    const W = 297, H = 210, M = 10, HEAD = 14;
+    const filt = (state.f.compra === 'all' ? 'Todos los participantes' : state.f.compra === 'Sí' ? 'Solo quienes lo comprarían' : 'Solo quienes no lo comprarían');
+    const header = p => {
+      pdf.setFillColor(236, 23, 67); pdf.rect(0, 0, W, HEAD, 'F');
+      pdf.setTextColor(255, 255, 255); pdf.setFont('helvetica', 'bold'); pdf.setFontSize(11);
+      pdf.text(CONFIG.campaign + '  |  Samplia Insights', M, 9);
+      pdf.setFont('helvetica', 'normal'); pdf.setFontSize(8.5);
+      pdf.text(`${filt}  |  Página ${p}`, W - M, 9, { align: 'right' });
+    };
+    let page = 1; header(page); let y = HEAD + 6;
+    for (const el of $$('[data-pdf-block]')) {
+      // Los controles (p. ej. el interruptor con appearance:none) rompen html2canvas y no aportan nada al PDF
+      const cv = await html2canvas(el, { scale: 2, backgroundColor: '#F6F7F9', useCORS: true, logging: false,
+        ignoreElements: n => n.matches?.('.switch, .mini-seg, input, button') });
+      let w = W - 2 * M, h = cv.height * w / cv.width; const maxH = H - HEAD - 6 - M;
+      if (h > maxH) { w *= maxH / h; h = maxH; }
+      if (y + h > H - M) { pdf.addPage(); page++; header(page); y = HEAD + 6; }
+      pdf.addImage(cv.toDataURL('image/jpeg', .92), 'JPEG', M + (W - 2 * M - w) / 2, y, w, h);
+      y += h + 5;
+    }
+    pdf.save(CONFIG.pdfName);
+  } catch (e) { console.error(e); alert('No se pudo generar el PDF: ' + e.message); }
+  finally { document.body.classList.remove('pdf-mode'); btn.disabled = false; btn.textContent = label; }
+}
+
+/* ================= Arranque ================= */
+async function init() {
+  initControls();
+  try { await loadData(); }
+  catch (e) { setStatus('', 'Error al leer los datos: ' + e.message); console.error(e); return; }
+  renderQuestions(); renderAll();
+  $('#footStamp').textContent = state.source === 'live' ? 'Actualizado al abrir la página' : `Copia local del ${CONFIG.snapshotDate}`;
+  requestAnimationFrame(() => document.body.classList.add('ready'));
+}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+
+// Exposición mínima para pruebas
+window.__dash = { state, buildRows, parseCSV, themesOf, stats, rowsSel, renderAll };
+})();
+</script>
+</body>
+</html>
